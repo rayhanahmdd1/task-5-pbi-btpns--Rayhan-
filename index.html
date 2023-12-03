@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Rayhan's Vue-Project</title>
+  </head>
+  <body>
+    <body>
+      <h1>Upload Foto Profil</h1>
+
+      <!-- Form untuk upload foto profil -->
+      <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" name="profilePicture" accept="image/*" />
+        <button type="submit">Upload</button>
+      </form>
+
+      <hr />
+
+      <!-- Daftar foto profil yang telah diunggah -->
+      <h2>Foto Profil Anda</h2>
+      <div id="fotoProfil">
+        <!-- Daftar foto profil akan ditampilkan di sini -->
+      </div>
+
+      <!-- Script untuk meng-handle upload foto profil -->
+      <script>
+        // Fungsi untuk menangani submit form upload foto profil
+        document
+          .getElementById("uploadForm")
+          .addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            var formData = new FormData(this);
+
+            // Lakukan pengiriman data ke API menggunakan metode POST
+            fetch("/api/upload-profile-picture", {
+              method: "POST",
+              body: formData,
+              // Tambahkan header authorization/token jika diperlukan
+              // headers: {
+              //   'Authorization': 'Bearer token_here'
+              // }
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                // Tampilkan pesan berhasil atau handle respons dari server
+                console.log(data);
+                // Refresh daftar foto profil setelah upload berhasil
+                loadProfilePictures();
+              })
+              .catch((error) => console.error("Error:", error));
+          });
+
+        // Fungsi untuk memuat daftar foto profil pengguna dari API
+        function loadProfilePictures() {
+          // Lakukan pengambilan daftar foto profil dari API menggunakan metode GET
+          fetch("/api/get-profile-pictures")
+            .then((response) => response.json())
+            .then((data) => {
+              // Tampilkan daftar foto profil pengguna
+              var fotoProfilElement = document.getElementById("fotoProfil");
+              fotoProfilElement.innerHTML = ""; // Bersihkan konten sebelum menambahkan foto
+
+              data.forEach((picture) => {
+                // Tampilkan foto profil pengguna
+                var imgElement = document.createElement("img");
+                imgElement.src = picture.url;
+                imgElement.alt = "Foto Profil";
+                fotoProfilElement.appendChild(imgElement);
+              });
+            })
+            .catch((error) => console.error("Error:", error));
+        }
+
+        // Panggil fungsi untuk memuat daftar foto profil saat halaman dimuat
+        loadProfilePictures();
+      </script>
+    </body>
+  </body>
+</html>
